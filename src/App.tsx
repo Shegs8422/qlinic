@@ -44,6 +44,7 @@ const mainScreens = [
 
 export default function App() {
   const [screen, setScreen] = useState<"splash" | "app">("splash");
+  const [loading, setLoading] = useState(true);
   const { theme } = useSettingsStore();
 
   useEffect(() => {
@@ -56,8 +57,33 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [screen]);
 
+  useEffect(() => {
+    let active = true;
+    const init = async () => {
+      // Wait for splash to finish, then allow data to load
+      if (screen === "splash") return;
+      // Small delay to ensure UI is mounted before hiding loader
+      await new Promise((r) => setTimeout(r, 300));
+      if (active) setLoading(false);
+    };
+    init();
+    return () => {
+      active = false;
+    };
+  }, [screen]);
+
   const location = useLocation();
   const isMainScreen = mainScreens.includes(location.pathname);
+
+  if (loading) {
+    return (
+      <div className="loading-overlay">
+        <span class="t-shimmer loading-text" data-text="Loading Qlinic">
+          Loading Qlinic
+        </span>
+      </div>
+    );
+  }
 
   if (screen === "splash") {
     return <SplashScreen onStart={() => setScreen("app")} />;
