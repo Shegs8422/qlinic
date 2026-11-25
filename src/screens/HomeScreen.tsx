@@ -85,6 +85,7 @@ export function HomeScreen() {
             Compare estimated waits and choose when to make your way in.
           </p>
           <Button
+            variant="outline"
             onClick={() => navigate("/clinics")}
             icon={<HugeiconsIcon icon={Search01Icon} size={18} />}
           >

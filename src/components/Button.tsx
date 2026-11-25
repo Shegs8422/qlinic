@@ -1,6 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 
-export type ButtonVariant = "primary" | "secondary" | "quiet" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "quiet" | "danger" | "outline";
 
 interface ButtonProps {
   children: React.ReactNode;

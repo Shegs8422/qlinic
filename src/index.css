@@ -124,6 +124,8 @@ small { font-size: 0.78rem; color: var(--color-label-tertiary); }
 .button:active { transform: scale(0.98); }
 .button--primary { background: #000000; color: #ffffff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16); }
 .button--primary:hover { background: #1c1c1e; }
+.button--outline { background: #ffffff; color: #000000; border: 2px solid #000000; }
+.button--outline:hover { background: #f4f4f6; }
 .button--secondary { background: #ffffff; color: #000000; border: 1px solid var(--color-separator-hairline); }
 .button--secondary:hover { background: var(--color-surface-grouped); }
 .button--quiet { width: auto; min-height: 38px; color: #000000; background: transparent; font-weight: 700; padding: 0 12px; }
@@ -309,10 +311,10 @@ small { font-size: 0.78rem; color: var(--color-label-tertiary); }
 .segmented__active { background: #000000 !important; color: #ffffff !important; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14); }
 
 /* Quick Actions Grid */
-.quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.quick-action { min-height: 102px; padding: 14px; border: 1px solid var(--color-separator-hairline); border-radius: 18px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; background: #ffffff; cursor: pointer; transition: all 0.15s ease; }
+.quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.quick-action { min-height: 102px; padding: 16px; border: 1px solid var(--color-separator-hairline); border-radius: 18px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; background: #ffffff; cursor: pointer; transition: all 0.15s ease; }
 .quick-action:active { transform: scale(0.97); }
-.quick-action__icon { width: 36px; height: 36px; display: grid; place-items: center; color: #ffffff; background: #000000; border-radius: 9999px; }
+.quick-action__icon { width: 36px; height: 36px; display: grid; place-items: center; color: #ffffff; background: #000000; border-radius: 9999px; flex-shrink: 0; }
 .quick-action strong { font-size: 0.92rem; font-weight: 700; color: #000000; }
 .quick-action small { font-size: 0.76rem; color: var(--color-label-secondary); }
 
