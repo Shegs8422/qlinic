@@ -90,7 +90,7 @@ export function QueueConfirmScreen() {
 
           <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-dashed border-white/20 text-left">
             <div>
-              <span className="text-[11px] font-mono text-neutral-400 block">
+              <span className="text-[11px] font-sans text-neutral-400 block">
                 Patients ahead
               </span>
               <strong className="text-white text-base">
@@ -98,7 +98,7 @@ export function QueueConfirmScreen() {
               </strong>
             </div>
             <div className="text-right">
-              <span className="text-[11px] font-mono text-neutral-400 block">
+              <span className="text-[11px] font-sans text-neutral-400 block">
                 Estimated wait
               </span>
               <strong className="text-white text-base">

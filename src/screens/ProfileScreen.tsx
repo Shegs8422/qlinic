@@ -37,7 +37,7 @@ export function ProfileScreen() {
           <div>
             <h2 className="text-base text-white">{fullName}</h2>
             <p className="text-xs text-neutral-400">{email}</p>
-            <span className="text-[11px] font-mono text-neutral-400 block mt-0.5">
+            <span className="text-[11px] font-sans text-neutral-400 block mt-0.5">
               ID: {clinicId}
             </span>
           </div>

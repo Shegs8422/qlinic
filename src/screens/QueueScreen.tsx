@@ -57,7 +57,7 @@ export function QueueScreen() {
       <main className="content content--with-nav">
         <article className="ticket-pass flex flex-col items-center gap-3 text-center">
           <div className="w-full flex items-center justify-between border-b border-white/10 pb-3">
-            <span className="font-mono text-xs font-bold text-neutral-300 uppercase">
+            <span className="font-sans text-xs font-bold text-neutral-300 uppercase">
               STATUS
             </span>
             <Badge tone="light">{queueState}</Badge>
@@ -73,7 +73,7 @@ export function QueueScreen() {
 
           <div className="w-full grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-dashed border-white/20">
             <div className="text-left">
-              <span className="text-[11px] font-mono uppercase text-neutral-400 block">
+              <span className="text-[11px] font-sans uppercase text-neutral-400 block">
                 Est. Wait
               </span>
               <strong className="text-base text-white">
@@ -88,7 +88,7 @@ export function QueueScreen() {
               </strong>
             </div>
             <div className="text-right">
-              <span className="text-[11px] font-mono uppercase text-neutral-400 block">
+              <span className="text-[11px] font-sans uppercase text-neutral-400 block">
                 Ahead
               </span>
               <strong className="text-base text-white">
@@ -114,7 +114,7 @@ export function QueueScreen() {
         </article>
 
         <div className="flex items-center justify-between px-1">
-          <span className="text-xs text-neutral-500 font-mono">
+          <span className="text-xs text-neutral-500 font-sans">
             Updated just now
           </span>
           <button

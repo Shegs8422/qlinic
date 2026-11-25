@@ -46,7 +46,7 @@ export function AppointmentConfirmScreen() {
 
         <article className="card border-black w-full text-left my-2">
           <span className="eyebrow">BOOKING REF</span>
-          <strong className="text-2xl font-mono block">QL-1842</strong>
+          <strong className="text-2xl font-sans block">QL-1842</strong>
           <p className="text-xs font-bold mt-1">
             TUE, 3 NOVEMBER 2026 · 10:30 AM
           </p>

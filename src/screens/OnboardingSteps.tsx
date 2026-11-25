@@ -62,7 +62,7 @@ export function OnboardingSteps({ onBack, onGetStarted }: { onBack?: () => void;
             key={st.num}
             className="p-4 rounded-2xl border border-neutral-200 flex items-center gap-4 bg-white"
           >
-            <span className="font-mono text-lg font-extrabold text-black">
+            <span className="font-sans text-lg font-extrabold text-black">
               {st.num}
             </span>
             <div className="flex-1">

@@ -106,7 +106,7 @@ export function Modals() {
               <div className="bg-white p-2 rounded-xl text-black">
                 <HugeiconsIcon icon={QrCodeIcon} size={110} />
               </div>
-              <strong className="font-mono text-2xl tracking-widest">
+              <strong className="font-sans text-2xl tracking-widest">
                 OPD-024
               </strong>
               <span className="text-[11px] text-neutral-400">Amina Kamau</span>

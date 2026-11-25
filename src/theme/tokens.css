@@ -34,7 +34,7 @@
 
     /* Fonts */
     --font-sf: "Urbanist", sans-serif;
-    --font-mono: "Urbanist", monospace;
+    --font-mono: "Urbanist", sans-serif;
   }
 
   /* Dark theme (currently the default) */
