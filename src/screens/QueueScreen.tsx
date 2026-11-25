@@ -33,7 +33,7 @@ export function QueueScreen() {
         <TopBar
           title="Digital Queue"
         />
-        <main className="content content--with-nav items-center justify-center text-center">
+        <main className="empty-state">
           <HugeiconsIcon icon={Ticket01Icon} size={48} />
           <h2 className="mt-3">No active queue ticket</h2>
           <p className="text-xs max-w-xs mx-auto">
