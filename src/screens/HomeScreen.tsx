@@ -62,8 +62,8 @@ export function HomeScreen() {
 
   if (loading) {
     return (
-      <main className="content items-center justify-center py-20">
-        <span className="t-shimmer" data-text="Loading clinics">
+      <main className="empty-state">
+        <span class="t-shimmer" data-text="Loading clinics">
           Loading clinics
         </span>
       </main>
