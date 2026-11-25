@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/index.ts", "use": "@vercel/node" },
+    { "src": "package.json", "use": "@vercel/static-build" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.ts" }
+  ],
+  "env": {
+    "DATABASE_URL": "@qlinic_db_url",
+    "JWT_SECRET": "@qlinic_jwt_secret",
+    "CORS_ORIGIN": "@qlinic_cors_origin",
+    "NODE_ENV": "production"
+  }
+}
