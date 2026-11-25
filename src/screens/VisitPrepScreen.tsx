@@ -12,6 +12,7 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { useNavigate } from "react-router-dom";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { useSettingsStore } from "../store/settingsStore";
 import { useQueueStore } from "../store/queueStore";
 import { Button } from "../components/Button";
@@ -62,10 +63,111 @@ export function VisitPrepScreen() {
 
   const readyCount = Object.values(visitPrep).filter(Boolean).length;
   const isReady = readyCount === prepItems.length;
+  const [reorderReady, setReorderReady] = useState(false);
 
   const handleToggle = (key: string) => {
     setVisitPrep({ [key]: !visitPrep[key as keyof typeof visitPrep] } as any);
   };
+
+  // To-do reorder pointer orchestration (transitions-dev #37)
+  const listRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    setReorderReady(true);
+
+    let drag: { item: HTMLElement; rows: HTMLElement[]; from: number; to: number; startY: number; step: number } | null = null;
+    let pending: { run: () => void; timer: ReturnType<typeof setTimeout> } | null = null;
+
+    const slot = () => {
+      const gap = parseFloat(getComputedStyle(list).rowGap) || 0;
+      return (list.children[0] as HTMLElement).getBoundingClientRect().height + gap;
+    };
+    const ms = (name: string, fb: number) => {
+      const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+      return Number.isFinite(v) ? v : fb;
+    };
+
+    list.addEventListener("pointerdown", (e) => {
+      const target = e.target as HTMLElement;
+      const item = target.closest(".t-reorder-item") as HTMLElement | null;
+      if (!item || e.button !== 0) return;
+      if (pending) { clearTimeout(pending.timer); pending.run(); }
+      const rows = Array.from(list.children) as HTMLElement[];
+      drag = {
+        item,
+        rows,
+        from: rows.indexOf(item),
+        to: rows.indexOf(item),
+        startY: e.clientY,
+        step: slot(),
+      };
+      try { item.setPointerCapture(e.pointerId); } catch {}
+      item.classList.add("is-dragging");
+      item.style.setProperty("--dy", "0px");
+    });
+
+    list.addEventListener("pointermove", (e) => {
+      if (!drag || !list) return;
+      const d = drag;
+      const dy = e.clientY - d.startY;
+      d.item.style.setProperty("--dy", dy + "px");
+
+      const to = Math.max(
+        0,
+        Math.min(d.rows.length - 1, d.from + Math.round(dy / d.step))
+      );
+      if (to === d.to) return;
+      d.to = to;
+
+      d.rows.forEach((row, i) => {
+        if (row === d.item) return;
+        let shift = 0;
+        if (d.from < to && i > d.from && i <= to) shift = -d.step;
+        if (d.from > to && i >= to && i < d.from) shift = d.step;
+        row.style.transform = `translateY(${shift}px)`;
+      });
+    });
+
+    function end() {
+      if (!drag || !list) return;
+      const d = drag;
+      drag = null;
+      d.item.classList.remove("is-dragging");
+      d.item.style.setProperty("--rest", (d.to - d.from) * d.step + "px");
+      d.item.classList.add("is-settling");
+
+      const run = () => {
+        if (!pending) return;
+        pending = null;
+        const ref = d.rows[d.to > d.from ? d.to + 1 : d.to];
+        list.insertBefore(d.item, ref || null);
+        d.rows.forEach((row) => {
+          row.style.transition = "none";
+          row.style.transform = "";
+          row.style.removeProperty("--dy");
+          row.style.removeProperty("--rest");
+        });
+        d.item.classList.remove("is-settling");
+        void list.offsetHeight;
+        d.rows.forEach((row) => { row.style.transition = ""; });
+      };
+      pending = { run, timer: setTimeout(run, ms("--reorder-drop", 260)) };
+    }
+    list.addEventListener("pointerup", end);
+    list.addEventListener("pointercancel", end);
+
+    return () => {
+      list.removeEventListener("pointerdown", (e) => {});
+      list.removeEventListener("pointermove", (e) => {});
+      list.removeEventListener("pointerup", end);
+      list.removeEventListener("pointercancel", end);
+    };
+  }, [reorderReady]);
+
+  const handleToggleReorder = useCallback((key: string) => {
+    setVisitPrep({ [key]: !visitPrep[key as keyof typeof visitPrep] } as any);
+  }, [visitPrep, setVisitPrep]);
 
   return (
     <>
@@ -133,18 +235,16 @@ export function VisitPrepScreen() {
               {isReady ? "COMPLETE" : `${prepItems.length - readyCount} LEFT`}
             </span>
           </div>
-          <div className="prep-list">
+          <ul className="t-reorder" ref={listRef}>
             {prepItems.map((item) => {
               const checked = visitPrep[item.key as keyof typeof visitPrep];
               return (
-                <button
+                <li
                   key={item.key}
-                  className={`prep-item ${
-                    checked ? "prep-item--checked" : ""
-                  }`}
+                  className={`t-reorder-item ${checked ? "prep-item--checked" : ""}`}
                   role="checkbox"
                   aria-checked={checked}
-                  onClick={() => handleToggle(item.key)}
+                  onClick={() => handleToggleReorder(item.key)}
                 >
                   <span className="prep-item__icon">{item.icon}</span>
                   <span className="prep-item__copy">
@@ -154,19 +254,21 @@ export function VisitPrepScreen() {
                   <span className="prep-item__check" aria-hidden="true">
                     {checked && <HugeiconsIcon icon={Tick02Icon} size={16} />}
                   </span>
-                </button>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </section>
 
         {isReady && (
-          <Notice
-            icon={<HugeiconsIcon icon={CheckmarkBadge01Icon} size={19} />}
-          >
-            Everything is checked. Keep your queue pass or booking reference
-            ready for reception.
-          </Notice>
+          <div className="t-success-check" data-state="in" aria-hidden="true">
+            <Notice
+              icon={<HugeiconsIcon icon={CheckmarkBadge01Icon} size={19} />}
+            >
+              Everything is checked. Keep your queue pass or booking reference
+              ready for reception.
+            </Notice>
+          </div>
         )}
 
         <section className="settings-section">

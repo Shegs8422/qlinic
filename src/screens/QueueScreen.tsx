@@ -77,7 +77,14 @@ export function QueueScreen() {
                 Est. Wait
               </span>
               <strong className="text-base text-white">
-                {selectedClinic?.wait || "Unavailable"}
+                <span className="t-subtle-number is-animating" style={{ "--subtle-dir": "1" } as React.CSSProperties}>
+                  <span className="t-subtle-slot">
+                    <span className="t-subtle-old" aria-hidden="true">0</span>
+                    <span className="t-subtle-new">
+                      {selectedClinic?.wait || "Unavailable"}
+                    </span>
+                  </span>
+                </span>
               </strong>
             </div>
             <div className="text-right">
@@ -85,7 +92,14 @@ export function QueueScreen() {
                 Ahead
               </span>
               <strong className="text-base text-white">
-                {selectedClinic?.patientsAhead}
+                <span className="t-subtle-number is-animating" style={{ "--subtle-dir": "1" } as React.CSSProperties}>
+                  <span className="t-subtle-slot">
+                    <span className="t-subtle-old" aria-hidden="true">0</span>
+                    <span className="t-subtle-new">
+                      {selectedClinic?.patientsAhead}
+                    </span>
+                  </span>
+                </span>
               </strong>
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
   Call02Icon,
 } from "@hugeicons/core-free-icons";
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useClinicStore } from "../store/clinicStore";
 import { useQueueStore } from "../store/queueStore";
 import { useSettingsStore } from "../store/settingsStore";
@@ -17,7 +18,7 @@ import { Badge } from "../components/Badge";
 import { Notice } from "../components/Notice";
 import { TopBar } from "../components/TopBar";
 import { GoogleMapPreview } from "../components/GoogleMapPreview";
-import { clinics } from "../data/mockData";
+import { data } from "../data";
 
 export function ClinicDetailScreen() {
   const { id } = useParams();
@@ -33,19 +34,46 @@ export function ClinicDetailScreen() {
     setReturnScreen,
   } = useSettingsStore();
 
-  const clinic = clinics.find((c) => c.id === id) || clinics[0];
+  const [clinic, setClinic] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!id) return;
+      try {
+        const c = await data.getClinic(id);
+        setClinic(c);
+      } catch {
+        setClinic(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [id]);
 
   const handleJoinQueue = () => {
+    if (!clinic) return;
     setSelectedClinic(clinic);
     setReturnScreen("clinicReturnScreen", "/clinics");
     setQueueClinic(clinic);
-    setSelectedService(clinic.services[0]);
+    setSelectedService(clinic.services?.[0] || "General outpatient");
     navigate("/queue-confirm");
   };
 
   const handleBook = () => {
     navigate("/booking");
   };
+
+  if (loading || !clinic) {
+    return (
+      <main className="content items-center justify-center py-20">
+        <span className="t-shimmer" data-text="Loading clinic details">
+          Loading clinic details
+        </span>
+      </main>
+    );
+  }
 
   return (
     <>
@@ -97,7 +125,7 @@ export function ClinicDetailScreen() {
         <section>
           <h2>Departments</h2>
           <div className="list-card">
-            {clinic.services.map((svc) => (
+            {clinic.services?.map((svc: string) => (
               <button
                 className="list-row w-full flex items-center justify-between"
                 key={svc}

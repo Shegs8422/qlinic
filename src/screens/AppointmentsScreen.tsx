@@ -1,11 +1,11 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar03Icon, UserIcon, Settings02Icon } from "@hugeicons/core-free-icons";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useSettingsStore } from "../store/settingsStore";
 import { Button } from "../components/Button";
 import { TopBar } from "../components/TopBar";
-import { pastAppointmentsList } from "../data/mockData";
-import { useRef, useEffect, useState } from "react";
+import { data } from "../data";
 import { Badge } from "../components/Badge";
 
 export function AppointmentsScreen() {
@@ -14,18 +14,32 @@ export function AppointmentsScreen() {
     setReturnScreen,
   } = useSettingsStore();
 
+  const [appointments, setAppointments] = useState<any[]>([]);
   const [appointmentTab, setAppointmentTab] = useState<"upcoming" | "past">("upcoming");
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const pillRef = useRef<HTMLSpanElement>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const bar = tabsRef.current;
-    const pillEl = pillRef.current;
+    const load = async () => {
+      try {
+        const appts = await data.getPastAppointments();
+        setAppointments(appts);
+      } catch {
+        setAppointments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  useEffect(() => {
+    const bar = document.querySelector<HTMLElement>(".t-tabs");
+    const pillEl = document.querySelector<HTMLElement>(".t-tabs-pill");
     if (!bar || !pillEl) return;
 
-    const pill = pillEl;
-
     const tabs = [...bar.querySelectorAll<HTMLElement>(".t-tab")];
+
+    const pill = pillEl!;
 
     function moveTo(tab: HTMLElement, animate: boolean) {
       if (!animate) {
@@ -57,13 +71,15 @@ export function AppointmentsScreen() {
       });
     });
 
-    requestAnimationFrame(() => moveTo(active(), false));
+    moveTo(active(), false);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const appointment = true;
-  const appointmentCancelled = false;
+  const pastAppts = appointments.filter((a: any) => a.status !== "PENDING");
+  const upcomingAppts = appointments.filter(
+    (a: any) => a.status === "PENDING" || a.status === "CONFIRMED"
+  );
 
   return (
     <>
@@ -71,8 +87,8 @@ export function AppointmentsScreen() {
         title="Bookings"
       />
       <main className="content content--with-nav">
-        <div className="t-tabs" ref={tabsRef} role="tablist">
-          <span className="t-tabs-pill" ref={pillRef} aria-hidden="true"></span>
+        <div className="t-tabs" role="tablist">
+          <span className="t-tabs-pill" aria-hidden="true"></span>
           <button
             className="t-tab"
             role="tab"
@@ -89,7 +105,7 @@ export function AppointmentsScreen() {
             aria-selected={appointmentTab === "past"}
             onClick={() => setAppointmentTab("past")}
           >
-            Past visits ({pastAppointmentsList.length})
+            Past visits ({pastAppts.length})
           </button>
         </div>
 
@@ -104,20 +120,25 @@ export function AppointmentsScreen() {
         </Button>
 
         {appointmentTab === "upcoming" ? (
-          appointment && !appointmentCancelled ? (
-            <article className="card border-black">
-              <Badge tone="success">Confirmed</Badge>
-              <h3>General outpatient</h3>
-              <p className="text-sm font-bold text-black">
-                Central Community Clinic
-              </p>
-              <small>Tuesday · 10:30 AM · Ref: QL-1842</small>
-              <div className="pt-2">
-                <Button variant="secondary" onClick={() => navigate("/appointment")}>
-                  Manage booking
-                </Button>
-              </div>
-            </article>
+          upcomingAppts.length > 0 ? (
+            upcomingAppts.map((appt: any) => (
+              <article key={appt.id} className="card border-black">
+                <Badge tone="success">Confirmed</Badge>
+                <h3>{appt.service}</h3>
+                <p className="text-sm font-bold text-black">
+                  {appt.clinic}
+                </p>
+                <small>
+                  {new Date(appt.date).toLocaleDateString("en-US", { weekday: "short" })} ·
+                  {appt.time} · Ref: {appt.ref}
+                </small>
+                <div className="pt-2">
+                  <Button variant="secondary" onClick={() => navigate("/appointment")}>
+                    Manage booking
+                  </Button>
+                </div>
+              </article>
+            ))
           ) : (
             <article className="empty-card">
               <HugeiconsIcon icon={Calendar03Icon} size={28} />
@@ -130,30 +151,46 @@ export function AppointmentsScreen() {
             </article>
           )
         ) : (
-          <div className="stack">
-            {pastAppointmentsList.map((past) => (
-              <article className="card" key={past.id}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="eyebrow">{past.date}</span>
-                    <h3 className="text-sm mt-0.5">{past.service}</h3>
-                    <p className="text-xs">
-                      {past.clinic} · {past.doctor}
-                    </p>
+          loading ? (
+            <div className="stack items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+            </div>
+          ) : pastAppts.length > 0 ? (
+            <div className="stack">
+              {pastAppts.map((past: any) => (
+                <article key={past.id} className="card">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="eyebrow">{past.date}</span>
+                      <h3 className="text-sm mt-0.5">{past.service}</h3>
+                      <p className="text-xs">
+                        {past.clinic} · {past.doctor}
+                      </p>
+                    </div>
+                    <Badge tone="neutral">{past.status}</Badge>
                   </div>
-                  <Badge tone="neutral">{past.status}</Badge>
-                </div>
-                <p className="text-xs p-3 rounded-xl bg-neutral-100">
-                  {past.notes}
+                  <p className="text-xs p-3 rounded-xl bg-neutral-100">
+                    {past.notes}
+                  </p>
+                  <button
+                    className="text-xs font-bold underline text-left"
+                  >
+                    View clinic record
+                  </button>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <article className="empty-card">
+              <HugeiconsIcon icon={Calendar03Icon} size={28} />
+              <div>
+                <h3 className="text-sm">No past visits</h3>
+                <p className="text-xs">
+                  Your appointment history will appear here.
                 </p>
-                <button
-                  className="text-xs font-bold underline text-left"
-                >
-                  View clinic record
-                </button>
-              </article>
-            ))}
-          </div>
+              </div>
+            </article>
+          )
         )}
       </main>
     </>

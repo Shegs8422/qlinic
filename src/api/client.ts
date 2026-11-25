@@ -63,6 +63,18 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
+  // Auth
+  sendOtp: (phone: string) =>
+    request<any>("/api/auth/send-otp", {
+      method: "POST",
+      body: JSON.stringify({ phone }),
+    }),
+  verifyOtp: (phone: string, code: string) =>
+    request<any>("/api/auth/verify-otp", {
+      method: "POST",
+      body: JSON.stringify({ phone, code }),
+    }),
+
   // Config
   googleMapsApiKey: () => GOOGLE_MAPS_API_KEY,
 }

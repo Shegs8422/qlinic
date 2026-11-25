@@ -39,6 +39,16 @@ export function EmailSignUpScreen({ onBack }: { onBack?: () => void }) {
     }
   };
 
+  if (loading) {
+    return (
+      <main className="content items-center justify-center py-20">
+        <span className="t-shimmer" data-text="Creating account…">
+          Creating account…
+        </span>
+      </main>
+    );
+  }
+
   return (
     <main className="content">
       <header className="topbar">

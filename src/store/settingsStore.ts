@@ -17,7 +17,7 @@ interface SettingsState {
   showAccessibilityModal: boolean;
   showHelpModal: boolean;
   showSignOutModal: boolean;
-  snackbarMessage: string | null;
+  notifications: Array<{ id: string; message: string }>;
   settingsReturnScreen: string;
   profileReturnScreen: string;
   bookingReturnScreen: string;
@@ -75,7 +75,7 @@ export const useSettingsStore = create<SettingsState>()(
       showAccessibilityModal: false,
       showHelpModal: false,
       showSignOutModal: false,
-      snackbarMessage: null,
+      notifications: [],
       settingsReturnScreen: "home",
       profileReturnScreen: "home",
       bookingReturnScreen: "appointments",
@@ -97,16 +97,28 @@ export const useSettingsStore = create<SettingsState>()(
       setShowAccessibilityModal: (v) => set({ showAccessibilityModal: v }),
       setShowHelpModal: (v) => set({ showHelpModal: v }),
       setShowSignOutModal: (v) => set({ showSignOutModal: v }),
-      setSnackbarMessage: (msg) => set({ snackbarMessage: msg }),
+      setSnackbarMessage: (msg) => {
+        if (msg === null) return;
+        set((prev) => ({
+          notifications: [{ id: Math.random().toString(36).slice(2), message: msg }, ...prev.notifications].slice(0, 4),
+        }));
+      },
       setReturnScreen: (key, v) => set({ [key]: v }),
 
       notify: (msg, duration = 2600) => {
-        set({ snackbarMessage: msg });
+        const id = Math.random().toString(36).slice(2);
+        set((prev) => ({
+          notifications: [{ id, message: msg }, ...prev.notifications].slice(0, 4),
+        }));
         if (get().accessibility.audioAnnouncements && "speechSynthesis" in window) {
           window.speechSynthesis.cancel();
           window.speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
         }
-        setTimeout(() => set({ snackbarMessage: null }), duration);
+        setTimeout(() => {
+          set((prev) => ({
+            notifications: prev.notifications.filter((n) => n.id !== id),
+          }));
+        }, duration);
       },
 
       resetVisitPrep: () => set({ visitPrep: defaultVisitPrep }),

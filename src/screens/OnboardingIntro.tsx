@@ -26,10 +26,14 @@ export function OnboardingIntro({ onSkip }: { onSkip?: () => void }) {
         />
       </div>
 
-      <section>
-        <span className="eyebrow">CARE, ON YOUR TIME</span>
-        <h1>Spend less time waiting for care.</h1>
-        <p>
+      <section className="t-stagger">
+        <strong className="t-stagger-line t-stagger-line--1 eyebrow">
+          CARE, ON YOUR TIME
+        </strong>
+        <h1 className="t-stagger-line t-stagger-line--2">
+          Spend less time waiting for care.
+        </h1>
+        <p className="t-stagger-line" style={{ transitionDelay: "80ms" }}>
           See estimated clinic waits, join a queue from wherever you are, and
           arrive closer to your turn.
         </p>

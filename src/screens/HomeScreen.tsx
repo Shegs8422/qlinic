@@ -15,6 +15,7 @@ import {
   Call02Icon,
 } from "@hugeicons/core-free-icons";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import { useQueueStore } from "../store/queueStore";
 import { useClinicStore } from "../store/clinicStore";
@@ -23,7 +24,8 @@ import { Button } from "../components/Button";
 import { Badge } from "../components/Badge";
 import { TopBar } from "../components/TopBar";
 import { ClinicCard } from "../components/ClinicCard";
-import { clinics } from "../data/mockData";
+import { Tooltip } from "../components/Tooltip";
+import { data } from "../data";
 
 export function HomeScreen() {
   const navigate = useNavigate();
@@ -32,26 +34,54 @@ export function HomeScreen() {
     useQueueStore();
   const { setReturnScreen } = useSettingsStore();
 
+  const [clinics, setClinics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const queueState = "Waiting";
   const appointment = true;
   const appointmentCancelled = false;
 
   const openProfile = () => navigate("/profile");
   const openSettings = () => navigate("/settings");
-  const openVisitPrep = () => navigate("/visit-prep");
-  const startBooking = () => navigate("/booking");
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const clinicList = await data.getClinics();
+        setClinics(clinicList);
+      } catch {
+        setClinics([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const closestClinic = clinics[0];
+
+  if (loading) {
+    return (
+      <main className="content items-center justify-center py-20">
+        <span className="t-shimmer" data-text="Loading clinics">
+          Loading clinics
+        </span>
+      </main>
+    );
+  }
 
   return (
     <>
-      <TopBar
-        onProfile={openProfile}
-        onSettings={openSettings}
-      />
+      <TopBar onProfile={openProfile} onSettings={openSettings} />
       <main className="content content--with-nav home-content">
-        <section className="home-hero">
-          <span className="eyebrow">PATIENT: {fullName.toUpperCase()}</span>
-          <h1>Plan care around your day.</h1>
-          <p>
+        <section className="home-hero t-stagger">
+          <strong className="t-stagger-line t-stagger-line--1 eyebrow">
+            PATIENT: {fullName.toUpperCase()}
+          </strong>
+          <h1 className="t-stagger-line t-stagger-line--2">
+            Plan care around your day.
+          </h1>
+          <p className="t-stagger-line" style={{ transitionDelay: "80ms" }}>
             Compare estimated waits and choose when to make your way in.
           </p>
           <Button
@@ -79,11 +109,27 @@ export function HomeScreen() {
                 </button>
               </div>
               <span className="eyebrow text-neutral-400">
-                {selectedService?.toUpperCase()} · NUMBER {queueNumber}
+                {selectedService?.toUpperCase()} · NUMBER{" "}
+                <span className="t-subtle-number is-animating" style={{ "--subtle-dir": "1" } as React.CSSProperties}>
+                  <span className="t-subtle-slot">
+                    <span className="t-subtle-old" aria-hidden="true">0</span>
+                    <span className="t-subtle-new">{queueNumber}</span>
+                  </span>
+                </span>
               </span>
-              <h2>{selectedClinic?.patientsAhead} patients ahead of you</h2>
+              <h2>
+                {selectedClinic?.patientsAhead} patients ahead of you
+              </h2>
               <p>
-                Estimated consultation: {selectedClinic?.wait || "Unavailable"}
+                Estimated consultation:{" "}
+                <span className="t-subtle-number is-animating" style={{ "--subtle-dir": "1" } as React.CSSProperties}>
+                  <span className="t-subtle-slot">
+                    <span className="t-subtle-old" aria-hidden="true">0</span>
+                    <span className="t-subtle-new">
+                      {selectedClinic?.wait || "Unavailable"}
+                    </span>
+                  </span>
+                </span>
               </p>
               <div className="visit-card-actions">
                 <Button variant="secondary" onClick={() => navigate("/queue")}>
@@ -91,7 +137,7 @@ export function HomeScreen() {
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={openVisitPrep}
+                  onClick={() => navigate("/visit-prep")}
                 >
                   Prepare to leave
                 </Button>
@@ -104,17 +150,17 @@ export function HomeScreen() {
                 <HugeiconsIcon icon={CalendarCheck01Icon} size={20} />
               </div>
               <span className="eyebrow text-neutral-500">
-                TUE, 3 NOVEMBER 2026 · 10:30 AM
+                TUE, 3 NOV · 10:30 AM
               </span>
               <h2>General outpatient consultation</h2>
-              <p>{selectedClinic?.name || "Central Community Clinic"} · Ref: QL-1842</p>
+              <p>{selectedClinic?.name || closestClinic?.name} · Ref: QL-1842</p>
               <div className="visit-card-actions">
                 <Button variant="secondary" onClick={() => navigate("/appointment")}>
                   View booking details
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={openVisitPrep}
+                  onClick={() => navigate("/visit-prep")}
                 >
                   Prepare for visit
                 </Button>
@@ -138,37 +184,38 @@ export function HomeScreen() {
             <h2>Quick services</h2>
           </div>
           <div className="quick-grid">
-            <button
-              onClick={() => navigate("/clinics")}
-              className="quick-action"
-            >
-              <div className="flex items-center justify-between w-full">
-                <span className="quick-action__icon">
-                  <HugeiconsIcon icon={UserGroupIcon} size={18} />
-                </span>
-                <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-              </div>
-              <div>
-                <strong>Join queue</strong>
-                <small>Remote pass</small>
-              </div>
-            </button>
+            <Tooltip label="Join a digital queue from this clinic">
+              <button onClick={() => navigate("/clinics")} className="quick-action">
+                <div className="flex items-center justify-between w-full">
+                  <span className="quick-action__icon">
+                    <HugeiconsIcon icon={UserGroupIcon} size={18} />
+                  </span>
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                </div>
+                <div>
+                  <strong>Join queue</strong>
+                  <small>Remote pass</small>
+                </div>
+              </button>
+            </Tooltip>
 
-            <button
-              onClick={startBooking}
-              className="quick-action"
-            >
-              <div className="flex items-center justify-between w-full">
-                <span className="quick-action__icon">
-                  <HugeiconsIcon icon={Calendar03Icon} size={18} />
-                </span>
-                <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-              </div>
-              <div>
-                <strong>Book visit</strong>
-                <small>Choose slot</small>
-              </div>
-            </button>
+            <Tooltip label="Book a scheduled appointment">
+              <button
+                onClick={() => navigate("/booking")}
+                className="quick-action"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="quick-action__icon">
+                    <HugeiconsIcon icon={Calendar03Icon} size={18} />
+                  </span>
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                </div>
+                <div>
+                  <strong>Book visit</strong>
+                  <small>Choose slot</small>
+                </div>
+              </button>
+            </Tooltip>
           </div>
         </section>
 
@@ -179,7 +226,9 @@ export function HomeScreen() {
               View all
             </Button>
           </div>
-          <ClinicCard clinic={clinics[0]} />
+          {closestClinic && (
+            <ClinicCard clinic={closestClinic} onJoinQueue={() => navigate("/service")} />
+          )}
         </section>
       </main>
     </>

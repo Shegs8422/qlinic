@@ -1,14 +1,13 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Calendar03Icon, Tick02Icon, ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-import { useState } from "react";
+import { Calendar03Icon, Tick02Icon, ArrowLeft01Icon, RefreshIcon } from "@hugeicons/core-free-icons";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useClinicStore } from "../store/clinicStore";
 import { useQueueStore } from "../store/queueStore";
 import { useSettingsStore } from "../store/settingsStore";
 import { Button } from "../components/Button";
 import { TopBar } from "../components/TopBar";
-import { clinics } from "../data/mockData";
-import { availableAppointmentDates, availableAppointmentSlots } from "../data/mockData";
+import { data } from "../data";
 
 export function BookingScreen() {
   const navigate = useNavigate();
@@ -27,9 +26,35 @@ export function BookingScreen() {
     setReturnScreen,
   } = useSettingsStore();
 
+  const [clinics, setClinics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [bookingStep, setBookingStep] = useState(1);
-  const [date, setDate] = useState(availableAppointmentDates[0]);
-  const [time, setTime] = useState("10:30 AM");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [confirming, setConfirming] = useState(false);
+
+  const availableDates = data.getAvailableDates();
+  const availableSlots = data.getAvailableSlots();
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const clinicList = await data.getClinics();
+        setClinics(clinicList);
+        if (clinicList.length > 0 && !selectedClinic) {
+          setSelectedClinic(clinicList[0]);
+          setSelectedService(clinicList[0].services?.[0] || "General outpatient");
+        }
+        if (availableDates.length > 0) setDate(availableDates[0]);
+        if (availableSlots.length > 0) setTime(availableSlots[0]);
+      } catch {
+        setClinics([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [selectedClinic]);
 
   const handleBack = () => {
     if (bookingStep > 1) {
@@ -38,6 +63,26 @@ export function BookingScreen() {
       navigate("/home");
     }
   };
+
+  const handleConfirm = async () => {
+    setConfirming(true);
+    await new Promise((r) => setTimeout(r, 800)); // simulate save
+    setQueueNumber("OPD-" + Math.floor(100 + Math.random() * 900));
+    if (selectedClinic) setQueueClinic(selectedClinic);
+    if (selectedService) setQueueService(selectedService);
+    setConfirming(false);
+    navigate("/appointment-confirm");
+  };
+
+  if (loading) {
+    return (
+      <main className="content items-center justify-center py-20">
+        <span className="t-shimmer" data-text="Loading clinics">
+          Loading clinics
+        </span>
+      </main>
+    );
+  }
 
   return (
     <>
@@ -60,11 +105,11 @@ export function BookingScreen() {
                 value={selectedClinic?.name || ""}
                 onChange={(e) => {
                   const c = clinics.find(
-                    (item) => item.name === e.target.value
+                    (item: any) => item.name === e.target.value
                   );
                   if (c) {
                     setSelectedClinic(c);
-                    setSelectedService(c.services[0]);
+                    setSelectedService(c.services?.[0] || "General outpatient");
                   }
                 }}
               >
@@ -77,7 +122,7 @@ export function BookingScreen() {
             </label>
 
             <div className="chips chips--wrap">
-              {selectedClinic?.services.map((svc) => (
+              {selectedClinic?.services?.map((svc: string) => (
                 <button
                   key={svc}
                   className={`chip ${
@@ -113,7 +158,7 @@ export function BookingScreen() {
             </section>
 
             <div className="chips">
-              {availableAppointmentDates.map((d) => (
+              {availableDates.map((d) => (
                 <button
                   key={d}
                   className={`chip ${date === d ? "chip--active" : ""}`}
@@ -129,7 +174,7 @@ export function BookingScreen() {
             </div>
 
             <div className="time-grid">
-              {availableAppointmentSlots.map((s) => (
+              {availableSlots.map((s) => (
                 <button
                   key={s}
                   className={`time-slot ${
@@ -176,15 +221,19 @@ export function BookingScreen() {
             </div>
 
             <div className="mt-auto pt-6 stack">
+              <div className="t-icon-swap" data-state={confirming ? "b" : "a"}>
+                <span className="t-icon" data-icon="a">
+                  <HugeiconsIcon icon={Calendar03Icon} size={18} />
+                </span>
+                <span className="t-icon" data-icon="b">
+                  <HugeiconsIcon icon={RefreshIcon} size={18} />
+                </span>
+              </div>
               <Button
-                onClick={() => {
-                  setQueueNumber("OPD-" + Math.floor(100 + Math.random() * 900));
-                  if (selectedClinic) setQueueClinic(selectedClinic);
-                  if (selectedService) setQueueService(selectedService);
-                  navigate("/appointment-confirm");
-                }}
+                disabled={confirming}
+                onClick={handleConfirm}
               >
-                Confirm booking
+                {confirming ? "Reserving…" : "Confirm booking"}
               </Button>
               <Button variant="quiet" onClick={() => setBookingStep(2)}>
                 Change slot

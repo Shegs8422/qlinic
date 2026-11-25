@@ -1,0 +1,200 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PATIENT
+  ADMIN
+  STAFF
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  MISSED
+}
+
+enum QueueRule {
+  REMOTE
+  ARRIVAL
+  RECEPTION
+}
+
+enum Language {
+  EN
+  SW
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  phone     String    @unique
+  fullName  String
+  clinicId  String?
+  role      UserRole  @default(PATIENT)
+  language  Language  @default(EN)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  appointments   Appointment[]
+  pastAppointments PastAppointment[]
+  reminders      Reminder[]
+  permissions    Permission?
+  accessibility  Accessibility?
+  visitPrep      VisitPrep?
+  sessions       Session[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Clinic {
+  id          String     @id @default(cuid())
+  name        String
+  area        String
+  distanceKm  Float
+  address     String
+  open        Boolean    @default(true)
+  wait        String?
+  updated     String?
+  rule        QueueRule  @default(REMOTE)
+  phone       String
+  transit     String?
+  latitude    Float
+  longitude   Float
+  patientsAhead Int      @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  services       ClinicService[]
+  appointments   Appointment[]
+  pastAppointments PastAppointment[]
+  directions     ClinicDirection?
+
+  @@index([open])
+  @@index([rule])
+  @@index([latitude, longitude])
+}
+
+model ClinicService {
+  id      String   @id @default(cuid())
+  clinicId String
+  clinic  Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  name    String
+
+  @@index([clinicId])
+}
+
+model ClinicDirection {
+  id        String   @id @default(cuid())
+  clinicId  String   @unique
+  clinic    Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  transit   String?
+  createdAt DateTime @default(now())
+}
+
+model Appointment {
+  id            String           @id @default(cuid())
+  userId        String
+  clinicId      String
+  clinic        Clinic           @relation(fields: [clinicId], references: [id])
+  service       String
+  doctor        String?
+  status        AppointmentStatus @default(PENDING)
+  appointmentDate DateTime
+  appointmentTime String
+  bookingRef    String          @unique
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([clinicId])
+  @@index([status])
+  @@index([bookingRef])
+}
+
+model PastAppointment {
+  id        String   @id @default(cuid())
+  userId    String
+  clinicId  String
+  clinic    Clinic   @relation(fields: [clinicId], references: [id])
+  service   String
+  doctor    String?
+  status    String   @default("Completed")
+  date      String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([clinicId])
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  userId    String
+  queue     Boolean  @default(true)
+  appointment Boolean @default(true)
+  clinic    Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Permission {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  notifications Boolean @default(true)
+  location   Boolean  @default(true)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Accessibility {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  highContrast     Boolean  @default(false)
+  largeText        Boolean  @default(false)
+  audioAnnouncements Boolean @default(false)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VisitPrep {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  identification Boolean @default(true)
+  medication   Boolean  @default(false)
+  records      Boolean  @default(false)
+  transport    Boolean  @default(false)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
