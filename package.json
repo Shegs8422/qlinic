@@ -10,6 +10,7 @@
     "format": "oxfmt"
   },
   "dependencies": {
+    "@better-auth/infra": "^0.4.31",
     "@hugeicons/core-free-icons": "^4.3.5",
     "@hugeicons/react": "^1.1.10",
     "better-auth": "^1.7.28",
