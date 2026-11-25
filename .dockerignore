@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+.env*
+.vite/
+*.log
+logs/
+.git/
+.gitignore
+Dockerfile
+docker-compose.yml
+nginx.conf
+.dockerignore
+README.md
+.figma/
+.opencode-skills/

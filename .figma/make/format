@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+formatter="./node_modules/.bin/oxfmt"
+
+if [[ ! -x "$formatter" ]]; then
+  echo "Formatter is unavailable. Run .figma/make/install first." >&2
+  exit 1
+fi
+
+if [[ "$#" -eq 0 ]]; then
+  exec "$formatter"
+fi
+
+targets=()
+for target in "$@"; do
+  case "$target" in
+    *.js|*.jsx|*.mjs|*.cjs|*.ts|*.tsx|*.mts|*.cts|*.json|*.jsonc)
+      targets+=("$target")
+      ;;
+  esac
+done
+
+# oxfmt does not support CSS yet. Treat CSS-only format requests from the
+# visual editor as a successful no-op instead of failing the whole update.
+if [[ "${#targets[@]}" -eq 0 ]]; then
+  exit 0
+fi
+
+exec "$formatter" "${targets[@]}"
