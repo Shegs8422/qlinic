@@ -13,7 +13,6 @@ interface ClinicCardProps {
 export function ClinicCard({ clinic, onJoinQueue }: ClinicCardProps) {
   const tiltRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const [isHover, setIsHover] = useState(false);
 
   useEffect(() => {
     const tilt = tiltRef.current;
@@ -24,7 +23,6 @@ export function ClinicCard({ clinic, onJoinQueue }: ClinicCardProps) {
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 
     function reset() {
-      setIsHover(false);
       card!.classList.remove("is-tilting");
       card!.style.setProperty("--tilt-rx", "0deg");
       card!.style.setProperty("--tilt-ry", "0deg");
@@ -35,7 +33,6 @@ export function ClinicCard({ clinic, onJoinQueue }: ClinicCardProps) {
       const r = tilt!.getBoundingClientRect();
       const px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
       const py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-      setIsHover(true);
       card!.classList.add("is-tilting");
       card!.style.setProperty("--tilt-ry", ((px - 0.5) * MAX).toFixed(2) + "deg");
       card!.style.setProperty("--tilt-rx", ((0.5 - py) * MAX).toFixed(2) + "deg");
@@ -74,7 +71,7 @@ export function ClinicCard({ clinic, onJoinQueue }: ClinicCardProps) {
           </Badge>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-neutral-100/60 border border-neutral-200/60 flex items-center gap-3">
+        <div className="p-4 rounded-2xl bg-[#f4f4f6] border border-neutral-200 flex items-center gap-4 my-3">
           <HugeiconsIcon icon={Clock01Icon} size={20} />
           <div>
             <span className="eyebrow block">Estimated wait</span>
@@ -84,13 +81,13 @@ export function ClinicCard({ clinic, onJoinQueue }: ClinicCardProps) {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 mb-3">
           {clinic.services.map((svc) => (
             <button
               key={svc}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold border border-neutral-200 transition-colors"
+              className="px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold border border-neutral-200 text-sm transition-colors"
               onClick={() => {
-                // Navigation handled by parent via onJoinQueue or link
+                // Service selection handled by parent
               }}
             >
               {svc}
@@ -98,7 +95,7 @@ export function ClinicCard({ clinic, onJoinQueue }: ClinicCardProps) {
           ))}
         </div>
 
-        <div className="row row--between pt-2 border-t border-neutral-100">
+        <div className="row row--between pt-3 border-t border-neutral-200">
           <button
             className="text-xs font-bold text-neutral-600 hover:text-black flex items-center gap-1.5"
             onClick={() => {
@@ -114,7 +111,7 @@ export function ClinicCard({ clinic, onJoinQueue }: ClinicCardProps) {
             </Link>
             {clinic.open && clinic.rule === "remote" && (
               <button
-                className="px-4 py-2 bg-black text-white rounded-full text-xs font-extrabold hover:bg-neutral-900 transition-all flex items-center gap-1.5 active:scale-95"
+                className="px-5 py-2.5 bg-black text-white rounded-full text-xs font-extrabold flex items-center gap-1.5 active:scale-95 transition-all"
                 onClick={onJoinQueue}
               >
                 <HugeiconsIcon icon={Ticket01Icon} size={13} />

@@ -7,7 +7,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useClinicStore } from "../store/clinicStore";
 import { Button } from "../components/Button";
-import { IconButton } from "../components/IconButton";
 import { Badge } from "../components/Badge";
 import { TopBar } from "../components/TopBar";
 import { SkeletonLoader } from "../components/SkeletonLoader";
@@ -200,12 +199,15 @@ export function ClinicsScreen() {
     };
   }, []);
 
+  const hasFilters = openOnly || shortest || remoteOnly || serviceFilter !== "All";
+
   return (
     <>
       <TopBar
         title="Public Clinics"
       />
       <main className="content content--with-nav">
+        {/* Search */}
         <div
           className={`t-clear ${query ? "has-value" : ""} ${isClearing ? "is-clearing" : ""}`}
           ref={searchRef}
@@ -233,6 +235,7 @@ export function ClinicsScreen() {
           )}
         </div>
 
+        {/* Loading */}
         {isLoading ? (
           <div className="stack">
             <SkeletonLoader className="h-20 w-3/4" />
@@ -241,8 +244,9 @@ export function ClinicsScreen() {
           </div>
         ) : (
           <>
+            {/* Filter chips */}
             <div className="stack">
-              <div className="chips">
+              <div className="chips chips--wrap">
                 <button
                   className={`chip ${openOnly ? "chip--active" : ""}`}
                   onClick={() => setOpenOnly(!openOnly)}
@@ -268,13 +272,11 @@ export function ClinicsScreen() {
                   <span>Remote queue</span>
                 </button>
               </div>
-              <div className="chips">
+              <div className="chips chips--wrap">
                 {serviceFilterOptions.map((opt) => (
                   <button
                     key={opt}
-                    className={`chip ${
-                      serviceFilter === opt ? "chip--active" : ""
-                    }`}
+                    className={`chip ${serviceFilter === opt ? "chip--active" : ""}`}
                     onClick={() => setServiceFilter(opt)}
                     aria-pressed={serviceFilter === opt}
                   >
@@ -287,24 +289,24 @@ export function ClinicsScreen() {
               </div>
             </div>
 
+            {/* Results header */}
             <div className="section-heading">
               <h2>Clinics found ({results.length})</h2>
-              {(openOnly || shortest || remoteOnly || serviceFilter !== "All") && (
-                <button
-                  className="text-xs font-bold underline"
-                  onClick={clearFilters}
-                >
+              {hasFilters && (
+                <Button variant="quiet" onClick={clearFilters}>
                   Clear filters
-                </button>
+                </Button>
               )}
             </div>
 
+            {/* Error */}
             {error && (
               <div className="notice">
                 <span>Unable to load clinics. Showing cached data.</span>
               </div>
             )}
 
+            {/* Clinic results */}
             {results.length > 0 ? (
               <div className="stack clinic-results">
                 {results.map((clinic) => (
@@ -319,16 +321,14 @@ export function ClinicsScreen() {
                 ))}
               </div>
             ) : (
-              <article className="empty-card">
-                <HugeiconsIcon icon={Search01Icon} size={28} />
-                <div>
-                  <h3>No matching clinics</h3>
-                  <p>Try a different search or clear your filters.</p>
-                </div>
+              <div className="empty-state">
+                <HugeiconsIcon icon={Search01Icon} size={48} />
+                <h3>No matching clinics</h3>
+                <p>Try a different search or clear your filters.</p>
                 <Button variant="secondary" onClick={clearFilters}>
                   Clear search and filters
                 </Button>
-              </article>
+              </div>
             )}
           </>
         )}

@@ -648,3 +648,143 @@ small { font-size: 0.78rem; color: var(--color-label-tertiary); }
 @media (prefers-reduced-motion: reduce) {
   .t-clear-glow { opacity: 0 !important; }
 }
+
+/* --- Clinics page refinement --- */
+
+/* Search bar container - white fill, proper height */
+.t-clear {
+  min-height: 56px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid var(--color-separator-hairline);
+}
+
+/* Focus state */
+.t-clear:focus-within {
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Input inside t-clear */
+.t-clear > input {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+/* Filter chips - wrap properly */
+.chips.chips--wrap {
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.chips.chips--wrap::-webkit-scrollbar {
+  display: none;
+}
+
+/* Clinic results - stacked with proper spacing */
+.clinic-results {
+  gap: 12px;
+}
+
+/* Section heading on Clinics page */
+.section-heading h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-label-primary);
+}
+
+/* Notice styling */
+.notice {
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: var(--color-surface-grouped);
+  border: 1px solid var(--color-separator-hairline);
+  color: var(--color-label-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Empty state on Clinics page */
+.empty-state {
+  min-height: calc(100vh - 200px);
+  padding-top: 40px;
+}
+.empty-state HugeiconsIcon,
+.empty-state svg {
+  color: var(--color-label-tertiary);
+  margin-bottom: 12px;
+}
+.empty-state h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-label-primary);
+  margin-bottom: 6px;
+}
+.empty-state p {
+  font-size: 0.88rem;
+  color: var(--color-label-secondary);
+  margin-bottom: 16px;
+}
+
+/* Clinic card refinement */
+.clinic-results article {
+  animation: t-fade-in 0.4s var(--ease-smooth-out) forwards;
+}
+@keyframes t-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Clear filters button */
+.section-heading button {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+.section-heading button:hover {
+  background: var(--color-fill-translucent);
+}
+
+/* --- transitions-dev: Card hover tilt (19-card-tilt) --- */
+.t-tilt {
+  perspective: 1000px;
+}
+.t-tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}
+.t-tilt-card.is-tilting {
+  transition: none;
+}
+.t-tilt-glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.4) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition: opacity 0.3s ease;
+}
+.t-tilt-card.is-tilting .t-tilt-glare {
+  opacity: 1;
+}
+
+/* Results count styling */
+.section-heading {
+  align-items: center;
+  gap: 12px;
+}
+
