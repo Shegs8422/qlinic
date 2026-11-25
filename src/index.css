@@ -237,6 +237,7 @@ small { font-size: 0.78rem; color: var(--color-label-tertiary); }
   z-index: 50;
   background: #ffffff;
   border-top: 1px solid var(--color-separator-hairline);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
 }
 .nav-item-ios27 {
   height: 52px;
@@ -246,9 +247,9 @@ small { font-size: 0.78rem; color: var(--color-label-tertiary); }
   justify-content: center;
   gap: 4px;
   border-radius: 12px;
-  color: #8e8e93;
+  color: #333333;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.01em;
   background: transparent;
   border: none;
@@ -256,7 +257,7 @@ small { font-size: 0.78rem; color: var(--color-label-tertiary); }
   transition: all 0.15s ease;
 }
 .nav-item-ios27:active { transform: scale(0.96); background: var(--color-fill-translucent); }
-.nav-item-ios27--active { color: #000000 !important; background: var(--color-fill-translucent); }
+.nav-item-ios27--active { color: #000000 !important; background: var(--color-surface-card); }
 .nav-item-ios27--active svg { fill: #000000; }
 
 /* Modals & Dialogs */

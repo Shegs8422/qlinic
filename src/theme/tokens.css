@@ -29,7 +29,7 @@
     --color-action-destructive-pressed: #b00020;
 
     /* Light theme overrides */
-    --color-system-bg: #000000;
+    --color-system-bg: #ffffff;
     --color-surface-canvas: #ffffff;
 
     /* Fonts */
@@ -39,10 +39,10 @@
 
   /* Dark theme (currently the default) */
   [data-theme="dark"] {
-    --color-system-bg: #000000;
+    --color-system-bg: #ffffff;
     --color-surface-canvas: #ffffff;
     --color-surface-grouped: #f4f4f6;
-    --color-surface-card: #ffffff;
+    --color-surface-card: #f4f4f6;
     --color-label-primary: #000000;
     --color-label-secondary: #6e6e73;
     --color-label-tertiary: #8e8e93;
@@ -51,9 +51,9 @@
   /* Light theme */
   [data-theme="light"] {
     --color-system-bg: #ffffff;
-    --color-surface-canvas: #f4f4f6;
+    --color-surface-canvas: #ffffff;
     --color-surface-grouped: #e5e5ea;
-    --color-surface-card: #ffffff;
+    --color-surface-card: #f4f4f6;
     --color-label-primary: #000000;
     --color-label-secondary: #6e6e73;
     --color-label-tertiary: #8e8e93;
@@ -61,10 +61,10 @@
 
   /* High contrast */
   [data-theme="high-contrast"] {
-    --color-system-bg: #000000;
+    --color-system-bg: #ffffff;
     --color-surface-canvas: #ffffff;
     --color-surface-grouped: #ffffff;
-    --color-surface-card: #ffffff;
+    --color-surface-card: #f4f4f6;
     --color-label-primary: #ffffff;
     --color-label-secondary: #ffffff;
     --color-label-tertiary: #ffffff;
