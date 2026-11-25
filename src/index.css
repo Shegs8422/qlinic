@@ -531,3 +531,120 @@ small { font-size: 0.78rem; color: var(--color-label-tertiary); }
   letter-spacing: -0.025em;
   color: var(--color-label-primary);
 }
+
+/* --- transitions-dev: Input clear with dissolve (13-input-clear-dissolve) --- */
+:root {
+  --clear-dur: 1000ms;
+  --clear-out-dur: 400ms;
+  --clear-in-dur: 400ms;
+  --clear-out-fly: 12px;
+  --clear-in-fly: 12px;
+  --clear-out-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --clear-in-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --clear-blur: 2px;
+  --glow-delay: 50ms;
+  --glow-peak-at: 0.15;
+  --glow-opacity: 0.42;
+  --glow-spread: 1.5;
+}
+
+/* The wrap clips the glow to its rounded box. */
+.t-clear {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* The input fills the wrap, with padding for the icon and clear button. */
+.t-clear > input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font: inherit;
+  color: var(--color-label-primary);
+  padding-left: 46px;   /* room for search icon */
+  padding-right: 46px;  /* room for clear button */
+}
+
+/* Mirror + placeholder sit absolutely over the input. */
+.t-clear-mirror,
+.t-clear-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  z-index: 2;
+  font: inherit;
+  color: var(--color-label-primary);
+  padding-left: 46px;
+  padding-right: 46px;
+}
+.t-clear-mirror { opacity: 0; }
+.t-clear.has-value .t-clear-mirror,
+.t-clear.is-clearing .t-clear-mirror { opacity: 1; }
+.t-clear.has-value > input,
+.t-clear.is-clearing > input {
+  -webkit-text-fill-color: transparent;
+}
+.t-clear.has-value .t-clear-placeholder { opacity: 0; }
+
+/* Streak overlay - JS writes radial-gradient layers here. */
+.t-clear-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+  mix-blend-mode: multiply;
+}
+
+/* Clear button - sits absolutely on the right side. */
+.t-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--color-label-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, color 0.15s ease;
+}
+.t-clear.has-value .t-clear-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+.t-clear-btn:hover {
+  color: var(--color-label-primary);
+  background: var(--color-fill-translucent);
+}
+
+/* Search icon - sits absolutely on the left side. */
+.t-clear > .HugeiconsIcon,
+.t-clear svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--color-label-tertiary);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-clear-glow { opacity: 0 !important; }
+}
