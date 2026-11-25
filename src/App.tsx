@@ -56,9 +56,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [screen]);
 
-  const location = useLocation();
-  const isMainScreen = mainScreens.includes(location.pathname);
-
   if (screen === "splash") {
     return (
       <BrowserRouter>
@@ -66,6 +63,9 @@ export default function App() {
       </BrowserRouter>
     );
   }
+
+  const location = useLocation();
+  const isMainScreen = mainScreens.includes(location.pathname);
 
   return (
     <BrowserRouter>

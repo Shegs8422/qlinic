@@ -1,5 +1,5 @@
 import type { Clinic, PastAppointment } from "./types"
-import { api } from "./api/client"
+import { api, setAuthToken } from "./api/client"
 
 // ---------------------------------------------------------------------------
 // Data service: real API only (no mock fallbacks)
@@ -44,7 +44,6 @@ export const data = {
   async verifyOtp(phone: string, code: string): Promise<boolean> {
     const res = await api.verifyOtp(phone, code)
     if (res.token) {
-      const { setAuthToken } = await import("./api/client")
       setAuthToken(res.token)
     }
     return true
