@@ -130,6 +130,18 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
       // Better Auth API routes — mounted on /api/auth/*
       server.middlewares.use((req, res, next) => {
         if (!req.url?.startsWith("/api/auth")) return next()
+
+        // CORS headers for cross-origin frontend (Vercel) → backend (Nobus)
+        res.setHeader("Access-Control-Allow-Origin", "*")
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie")
+        res.setHeader("Access-Control-Allow-Credentials", "true")
+
+        if (req.method === "OPTIONS") {
+          res.writeHead(204)
+          return res.end()
+        }
+
         return toNodeHandler(auth)(req as never, res as never)
       })
     },

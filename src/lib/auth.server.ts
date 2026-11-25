@@ -12,17 +12,21 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
-    requireEmailVerification: false,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      console.log(`[Better Auth Password Reset] ${user.email}: ${url}`)
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      console.log(`[Better Auth Email Verification] ${user.email}: ${url}`)
+    },
   },
   plugins: [
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
-        // In development, log the OTP to the console so it can be copied
-        // without configuring an email provider. In production, wire this
-        // up to a transactional email service (Resend, Mailtrap, etc.).
-        console.log(
-          `[Better Auth Email OTP] ${type} OTP for ${email}: ${otp}`,
-        )
+        console.log(`[Better Auth Email OTP] ${type} OTP for ${email}: ${otp}`)
       },
     }),
   ],
