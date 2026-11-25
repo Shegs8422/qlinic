@@ -65,7 +65,7 @@ export const useSettingsStore = create<SettingsState>()(
       permissions: defaultPermissions,
       accessibility: defaultAccessibility,
       visitPrep: defaultVisitPrep,
-      theme: "dark",
+      theme: "light",
       showLeaveDialog: false,
       showCancelDialog: false,
       showQrTicket: false,
