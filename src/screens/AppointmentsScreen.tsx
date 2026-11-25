@@ -37,9 +37,8 @@ export function AppointmentsScreen() {
     const pillEl = document.querySelector<HTMLElement>(".t-tabs-pill");
     if (!bar || !pillEl) return;
 
-    const tabs = [...bar.querySelectorAll<HTMLElement>(".t-tab")];
-
     const pill = pillEl!;
+    const tabs = [...bar.querySelectorAll<HTMLElement>(".t-tab")];
 
     function moveTo(tab: HTMLElement, animate: boolean) {
       if (!animate) {
@@ -140,20 +139,17 @@ export function AppointmentsScreen() {
               </article>
             ))
           ) : (
-            <article className="empty-card">
-              <HugeiconsIcon icon={Calendar03Icon} size={28} />
-              <div>
-                <h3 className="text-sm">No upcoming appointments</h3>
-                <p className="text-xs">
-                  Schedule a consultation to secure your time slot.
-                </p>
-              </div>
-            </article>
+            <div className="empty-state">
+              <HugeiconsIcon icon={Calendar03Icon} size={48} />
+              <h3>No upcoming appointments</h3>
+              <p>Schedule a consultation to secure your time slot.</p>
+            </div>
           )
         ) : (
           loading ? (
-            <div className="stack items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+            <div className="empty-state">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-4"></div>
+              <p className="text-sm text-neutral-500">Loading appointments</p>
             </div>
           ) : pastAppts.length > 0 ? (
             <div className="stack">
@@ -181,15 +177,11 @@ export function AppointmentsScreen() {
               ))}
             </div>
           ) : (
-            <article className="empty-card">
-              <HugeiconsIcon icon={Calendar03Icon} size={28} />
-              <div>
-                <h3 className="text-sm">No past visits</h3>
-                <p className="text-xs">
-                  Your appointment history will appear here.
-                </p>
-              </div>
-            </article>
+            <div className="empty-state">
+              <HugeiconsIcon icon={Calendar03Icon} size={48} />
+              <h3>No past visits</h3>
+              <p>Your appointment history will appear here.</p>
+            </div>
           )
         )}
       </main>
