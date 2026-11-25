@@ -56,19 +56,15 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [screen]);
 
-  if (screen === "splash") {
-    return (
-      <BrowserRouter>
-        <SplashScreen onStart={() => setScreen("app")} />
-      </BrowserRouter>
-    );
-  }
-
   const location = useLocation();
   const isMainScreen = mainScreens.includes(location.pathname);
 
+  if (screen === "splash") {
+    return <SplashScreen onStart={() => setScreen("app")} />;
+  }
+
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         <Route path="/" element={<HomeScreen />} />
         <Route path="/clinics" element={<ClinicsScreen />} />
@@ -98,6 +94,6 @@ export default function App() {
 
       <Snackbar />
       <Modals />
-    </BrowserRouter>
+    </>
   );
 }
