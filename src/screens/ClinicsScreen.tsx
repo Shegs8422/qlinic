@@ -216,7 +216,6 @@ export function ClinicsScreen() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search clinic name, road, service..."
           />
           <div className="t-clear-mirror" aria-hidden="true">
             {query.replace(/ /g, "\u00a0")}
